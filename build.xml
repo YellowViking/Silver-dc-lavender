@@ -1,0 +1,64 @@
+<project name='dc_lavender' default='dist' basedir='.'>
+  <description>Build the grammar dc_lavender </description>
+
+  <property environment='env'/>
+  <property name='jg' location='/Users/MacfOx/Downloads/silver/generated/'/>
+  <property name='sh' location='/Users/MacfOx/Downloads/silver/'/>
+  <property name='bin' location='${jg}/bin'/>
+  <property name='src' location='${jg}/src'/>
+
+  <path id='lib.classpath'>
+    <fileset dir='${sh}/jars' includes='SilverRuntime.jar CopperRuntime.jar CopperCompiler.jar' />
+  </path>
+
+  <path id='src.classpath'>
+    <pathelement location='${src}' />
+  </path>
+
+  <path id='compile.classpath'>
+    <path refid='src.classpath'/>
+    <path refid='lib.classpath'/>
+  </path>
+
+  <taskdef name='copper' classname='edu.umn.cs.melt.copper.ant.CopperAntTask' classpathref='lib.classpath'/>
+
+
+  <target name='init'>
+
+    <!-- Create the time stamp -->
+    <tstamp>
+      <format property='TIME' pattern='MM/dd/yyyy hh:mm aa'/>
+    </tstamp>
+
+    <mkdir dir='${bin}'/>
+  </target>
+
+  <target name='dist' depends='grammars'>
+
+    <pathconvert refid='lib.classpath' pathsep=' ' property='man.classpath' />
+    <jar destfile='dc_lavender.jar' basedir='${bin}'>
+       <include name='dc_lavender/*.class' />
+       <include name='core/*.class' />
+      <manifest>
+       <attribute name='Main-Class' value='dc_lavender.Main' />
+       <attribute name='Class-Path' value='${man.classpath}' />
+       <attribute name='Built-By' value='${user.name}' />
+       <attribute name='Implementation-Version' value='${TIME}' />
+      </manifest>
+    </jar>
+
+  </target>
+
+  <target name='grammars' depends='init, copper'>
+      <javac debug='on' classpathref='compile.classpath' srcdir='${src}' destdir='${bin}' includeantruntime='false'>
+       <include name='dc_lavender/*.java' />
+       <include name='core/*.java' />
+      </javac>
+  </target>
+
+  <target name='copper'>
+    <copper fullClassName='dc_lavender.Parser_dc_lavender_parse' inputFile='${src}/dc_lavender/Parser_dc_lavender_parse.copper' outputFile='${src}/dc_lavender/Parser_dc_lavender_parse.java' skin='OLD_XML' warnUselessNTs='no' dump='true' dumpType='HTML' dumpOnlyOnError='true' dumpFile='Parser_dc_lavender_parse.copperdump.html'/>
+  </target>
+
+
+</project>
